@@ -12,8 +12,11 @@
 <body>
     <header class="navbar">
         <div class="logo">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo">
+            <a href="/">
+                <img src="{{ asset('images/logo.png') }}" alt="Logo">
+            </a>
         </div>
+
         <div class="menu-icon">
             <img src="{{ asset('images/menus.png') }}" alt="Menu Icon">
         </div>
@@ -22,16 +25,16 @@
             <ul>
                 <li><a href="/">Home</a></li>
                 <li><a href="/about">About</a></li>
-                <li><a href="/image-gallery">Images</a></li>
-                <li><a href="/video-gallery">Videos</a></li>
-                <li><a href="/audio-gallery">Audios</a></li>
+                <li><a href="/image-gallery">Image-Gallery</a></li>
+                <li><a href="/video-gallery">Video-Gallery</a></li>
+                <li><a href="/audio-gallery">Audio-Gallery</a></li>
             </ul>
         </div>
     </header>
     <!-- About Us Section with Background Video -->
     <section class="about-section">
         <video autoplay muted loop playsinline class="about-video">
-            <source src="{{ asset('videos/train-pov.mp4') }}" type="video/mp4">
+            <source src="{{ asset('videos/city-pan-1.mp4') }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="about-overlay">
@@ -46,21 +49,26 @@
 
     <section class="video-grid">
     @foreach($data as $index => $item)
-        <div class="video-container" onclick="openModal({{ $index }})">
-            <div class="loader"></div>
-            <iframe width="250" height="150" 
-                src="https://drive.google.com/file/d/{{ $item->google_id }}/preview"
-                allowfullscreen 
-                onload="hideLoader(this)">
-            </iframe>
-            <div class="overlay">
-                <p>{{ $item->name }}</p>
-                <div class="circle">+</div>
-            </div>
-        </div>
-    @endforeach
+    <div class="video-container" onclick="openModal({{ $index }})">
 
-    </section>
+        <!-- Thumbnail Image (Click to Open Modal) -->
+        <img id="thumbnail{{ $index }}" class="video-thumbnail" 
+            src="https://drive.google.com/thumbnail?id={{ $item->google_id }}&sz=w250" 
+            alt="Video Thumbnail">
+        
+        <!-- Play Button Overlay -->
+        <div class="play-button">&#9658;</div>
+
+        <div class="overlay">
+            <p>{{ $item->name }}</p>
+            <div class="circle">+</div>
+        </div>
+    </div>
+@endforeach
+
+
+</section>
+
     <section class="modal" id="videoModal">
         <button class="close" onclick="closeModal()">&times;</button>
         <button class="prev" onclick="prevVideo()">&#10094;</button>
@@ -87,12 +95,13 @@
     </section>
     <footer class="footer-section">
         <div class="footer-container">
-        <img src="{{ asset('images/logo.png') }}" alt="Footer Logo" class="footer-logo">
+        <a href="/">
+                <img src="{{ asset('images/logo.png') }}" alt="Footer Logo" class="footer-logo">
+            </a>
             <nav class="footer-nav">
-                <a href="#" class="footer-link">Home</a>
+                <a href="/" class="footer-link">Home</a>
                 <a href="/about" class="footer-link">About</a>
-                <a href="#" class="footer-link">Gallery</a>
-                <a href="#" class="footer-link">Contact</a>
+                <a href="#contact-section" class="footer-link">Contact</a>
             </nav>
             <div class="footer-copy">© 2025 BrickMMO</div>
         </div>
@@ -120,9 +129,16 @@
         });
         let videos = @json($data);
         let currentIndex = 0;
+
         function openModal(index) {
             currentIndex = index;
-            document.getElementById('modalVideo').src = `https://drive.google.com/file/d/${videos[index].google_id}/preview?autoplay=1`;
+            let modalVideo = document.getElementById('modalVideo');
+
+            // Ensure video loads correctly inside an iframe
+            let videoUrl = `https://drive.google.com/file/d/${videos[index].google_id}/preview`;
+            modalVideo.src = videoUrl;
+
+            // Set modal title & details
             document.getElementById('modalTitle').innerText = videos[index].name;
             document.getElementById('modalDetails').innerHTML = `
                 <div class="modal-info">
@@ -134,28 +150,25 @@
                 </div>
             `;
 
-            let videoUrl = `https://drive.google.com/uc?export=download&id=${videos[index].google_id}`;
-            let videoName = `${videos[index].name.replace(/\s+/g, '_')}.mp4`; 
-
+            // Set download link correctly
             let downloadBtn = document.getElementById('downloadLink');
-            downloadBtn.href = videoUrl;
+            let downloadUrl = `https://drive.google.com/uc?export=download&id=${videos[index].google_id}`;
+            let videoName = `${videos[index].name.replace(/\s+/g, '_')}.mp4`;
+
+            downloadBtn.href = downloadUrl;
             downloadBtn.download = videoName;
 
             document.getElementById('videoModal').style.display = 'flex';
         }
-        function hideLoader(iframe) {
-            let loader = iframe.previousElementSibling; // Get the loader div
-            if (loader) loader.style.display = 'none'; // Hide the loader
-            iframe.style.visibility = 'visible'; // Show the video
-        }
-
+    
         function closeModal() { 
-            document.getElementById('modalVideo').src = ""; 
+            document.getElementById('modalVideo').src = ""; // Reset video source
             document.getElementById('videoModal').style.display = 'none'; 
         }
 
         function prevVideo() { if (currentIndex > 0) openModal(currentIndex - 1); }
         function nextVideo() { if (currentIndex < videos.length - 1) openModal(currentIndex + 1); }
+
     </script>
 </body>
 </html>
