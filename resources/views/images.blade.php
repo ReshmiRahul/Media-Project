@@ -33,7 +33,7 @@
     <!-- About Us Section with Background Video -->
     <section class="about-section">
         <div class="about-video">
-            <img src="{{ asset('images/city-hotel-6.jpg.jpg') }}" type="video/mp4">
+            <img src="{{ asset('images/gal1.webp') }}" type="video/mp4">
     </div>
         <div class="about-overlay">
             <h2 class="about-title">IMAGE GALLERY</h2>
